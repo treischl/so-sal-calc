@@ -6,6 +6,7 @@ from stackoverflow import SalaryCalculator
 
 salcalc = SalaryCalculator()
 (pos, exp, skl, cnt) = salcalc.get_mainstats()
+(cur, cnt) = salcalc.get_currencies_and_countries([int(c[0]) for c in cnt])
 
 with Database('debug.db') as db:
     db.reset_all()
@@ -22,7 +23,7 @@ with Database('debug.db') as db:
     skl = db.read_skilllevels()
     print(len(skl))
 
-    db.create_countries([(c[1], int(c[0]), 1 if c[1] in ['United Kingdom', 'United States'] else 0, None) for c in cnt])
+    db.create_countries([(c[0], c[1], c[2], None) for c in cnt])
     cnt = db.read_countries()
     print(len(cnt))
 
