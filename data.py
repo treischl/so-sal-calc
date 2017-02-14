@@ -28,11 +28,14 @@ _createorder = ['Currency',
                 'Skill',
                 'Country',
                 'Salary']
+_num2commit=0                
 
 class Database:
     def __init__(self,
-                 dbname='data.db'):
+                 dbname='data.db',
+                 maxuncommited=25):
         self._dbname = dbname
+        self._maxuncommited = maxuncommited
 
     def __enter__(self):
         self.open()
@@ -155,3 +158,23 @@ class Database:
         """
 
         self._conn.execute(_sql['Salary']['populate_table'])
+
+    def read_unpulled_salaries(self):
+        """
+        Returns all rows in the Salary table that haven't been pulled yet
+        """
+
+        return self._conn.execute(_sql['Salary']['read_not_pulled']).fetchall()
+
+    def update_pulled_salary(self, salary_id: int, amount: int):
+        """
+        Updates a salary after it's been pulled
+        """
+        global _num2commit
+
+        self._conn.execute(_sql['Salary']['update_after_pull'], (amount, salary_id))
+        _num2commit += 1
+        if (_num2commit % self._maxuncommited == 0):
+            self._conn.commit()
+            _num2commit = 0
+

@@ -32,7 +32,7 @@ class SalaryCalculator:
         
         return (positions, experiences, skills, countries)
 
-    def get_currencies_and_countries(self, country_values):
+    def get_currencies_and_countries(self, country_values: Iterable[int]):
         """
         Gets currency and country data for a list of countries
         country_values -> Iterable[value]
@@ -57,3 +57,12 @@ class SalaryCalculator:
             print('{}: {}'.format(country[0], currency))
         
         return (list(currencies.values()), countries)
+
+    def pull_salary(self, position: int, experience: int, skill: float, country: int, with_city=0):
+        """
+        Pulls a salary for the provided values.
+        """
+
+        html = _requestpage(position, experience, skill, country, with_city)
+        m = re.search(r'(\d+)[\.,\s](\d+)', html.find_all('div', class_='salary-value')[0].text)
+        return int('{}{}'.format(m.group(1), m.group(2)))
